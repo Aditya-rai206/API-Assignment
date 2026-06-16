@@ -1,0 +1,81 @@
+{
+  "run_timestamp": "2026-06-15T09:46:50.977062",
+  "jobs_found": 2,
+  "emails_sent": 0,
+  "jobs": [
+    {
+      "title": "Java Developer (Contract)",
+      "author": "Sarah Johnson",
+      "author_profile": "https://www.linkedin.com/in/sarah-johnson-recruiter",
+      "post_url": "https://www.linkedin.com/posts/demo1",
+      "post_text": "🚀 Urgent Hiring! Looking for a Java Developer for a 6-month CONTRACT role. Skills: Java, Spring Boot, Microservices. Location: Remote. C2C/W2 both ok. Please send resumes to demo.recruiter@techcorp.com",
+      "emails": [
+        "demo.recruiter@techcorp.com"
+      ],
+      "timestamp": "2h ago",
+      "keywords_found": [
+        "JAVA DEVELOPER"
+      ]
+    },
+    {
+      "title": "Java Backend Developer",
+      "author": "Mike Chen",
+      "author_profile": "https://www.linkedin.com/in/mike-chen-hiring",
+      "post_url": "https://www.linkedin.com/posts/demo2",
+      "post_text": "Hiring Java Backend Developer | Contract role | 12 months | Must have: Java 11+, REST APIs, SQL. Contact: hiring@innovatetech.io",
+      "emails": [
+        "hiring@innovatetech.io"
+      ],
+      "timestamp": "5h ago",
+      "keywords_found": [
+        "CONTRACT"
+      ]
+    }
+  ],
+  "email_results": [
+    {
+      "job": {
+        "title": "Java Developer (Contract)",
+        "author": "Sarah Johnson",
+        "author_profile": "https://www.linkedin.com/in/sarah-johnson-recruiter",
+        "post_url": "https://www.linkedin.com/posts/demo1",
+        "post_text": "🚀 Urgent Hiring! Looking for a Java Developer for a 6-month CONTRACT role. Skills: Java, Spring Boot, Microservices. Location: Remote. C2C/W2 both ok. Please send resumes to demo.recruiter@techcorp.com",
+        "emails": [
+          "demo.recruiter@techcorp.com"
+        ],
+        "timestamp": "2h ago",
+        "keywords_found": [
+          "JAVA DEVELOPER"
+        ]
+      },
+      "email": "demo.recruiter@techcorp.com",
+      "result": {
+        "success": false,
+        "message_id": null,
+        "error": "'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory."
+      }
+    },
+    {
+      "job": {
+        "title": "Java Backend Developer",
+        "author": "Mike Chen",
+        "author_profile": "https://www.linkedin.com/in/mike-chen-hiring",
+        "post_url": "https://www.linkedin.com/posts/demo2",
+        "post_text": "Hiring Java Backend Developer | Contract role | 12 months | Must have: Java 11+, REST APIs, SQL. Contact: hiring@innovatetech.io",
+        "emails": [
+          "hiring@innovatetech.io"
+        ],
+        "timestamp": "5h ago",
+        "keywords_found": [
+          "CONTRACT"
+        ]
+      },
+      "email": "hiring@innovatetech.io",
+      "result": {
+        "success": false,
+        "message_id": null,
+        "error": "'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory."
+      }
+    }
+  ]
+}

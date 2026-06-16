@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkedIn Auto-Applier | Aditya Rai</title>
+  <meta name="description" content="AI-powered LinkedIn job automation dashboard — auto-login, search, extract recruiter emails, and send applications via Gmail."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0d14;
+      --surface:    #111622;
+      --surface2:   #171e2e;
+      --border:     #1e2a40;
+      --accent:     #4f8ef7;
+      --accent2:    #7c3aed;
+      --green:      #22d3a5;
+      --red:        #f87171;
+      --yellow:     #fbbf24;
+      --text:       #e2e8f0;
+      --text-muted: #64748b;
+      --glow:       0 0 30px rgba(79,142,247,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated background mesh ───────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,142,247,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,0.07) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────────────────── */
+    .wrapper { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+
+    /* ─── Header ─────────────────────────────────────────────────────────── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 0 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+
+    .logo-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; box-shadow: var(--glow);
+    }
+
+    .logo-text h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; }
+    .logo-text p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .header-badge {
+      background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.15));
+      border: 1px solid rgba(79,142,247,0.3);
+      padding: 6px 14px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600; color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Step progress bar ───────────────────────────────────────────────── */
+    .steps-bar {
+      display: flex; align-items: flex-start; gap: 0;
+      margin: 36px 0 32px; position: relative;
+    }
+
+    .steps-bar::before {
+      content: ''; position: absolute;
+      top: 20px; left: calc(10% + 20px); right: calc(10% + 20px);
+      height: 2px; background: var(--border); z-index: 0;
+    }
+
+    .step {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      gap: 10px; position: relative; z-index: 1;
+    }
+
+    .step-dot {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all 0.4s;
+    }
+
+    .step.done .step-dot {
+      background: linear-gradient(135deg, var(--green), #0d9488);
+      border-color: var(--green);
+      box-shadow: 0 0 20px rgba(34,211,165,0.4);
+    }
+
+    .step.active .step-dot {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(79,142,247,0.5);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .step-label { font-size: 0.7rem; text-align: center; color: var(--text-muted); max-width: 80px; line-height: 1.4; }
+    .step.done .step-label, .step.active .step-label { color: var(--text); font-weight: 500; }
+
+    /* ─── Cards Grid ─────────────────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover { border-color: rgba(79,142,247,0.3); box-shadow: var(--glow); }
+    .card-full { grid-column: 1 / -1; }
+
+    .card-title {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--text-muted); text-transform: uppercase; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ─── Stat boxes ─────────────────────────────────────────────────────── */
+    .stats-row { display: flex; gap: 16px; }
+
+    .stat {
+      flex: 1; background: var(--surface2); border-radius: 12px;
+      padding: 18px; border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2.2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1;
+    }
+
+    .stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; }
+
+    /* ─── Control panel ───────────────────────────────────────────────────── */
+    .controls { display: flex; flex-direction: column; gap: 14px; }
+
+    .toggle-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .toggle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.78rem; color: var(--text); cursor: pointer;
+    }
+
+    .toggle input[type="checkbox"] {
+      appearance: none; width: 36px; height: 20px;
+      background: var(--border); border-radius: 10px;
+      position: relative; cursor: pointer; transition: background 0.3s;
+    }
+
+    .toggle input[type="checkbox"]:checked { background: var(--accent); }
+
+    .toggle input[type="checkbox"]::after {
+      content: ''; position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: white; transition: left 0.3s;
+    }
+
+    .toggle input[type="checkbox"]:checked::after { left: 18px; }
+
+    /* ─── Buttons ─────────────────────────────────────────────────────────── */
+    .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+
+    .btn {
+      flex: 1; padding: 12px 16px; border-radius: 10px; border: none;
+      font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center;
+      justify-content: center; gap: 7px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; box-shadow: 0 4px 20px rgba(79,142,247,0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 25px rgba(79,142,247,0.5);
+    }
+
+    .btn-secondary {
+      background: var(--surface2); color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ─── Status indicator ───────────────────────────────────────────────── */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+
+    .status-idle { background: rgba(100,116,139,0.15); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-running { background: rgba(79,142,247,0.15); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+    .status-completed { background: rgba(34,211,165,0.15); color: var(--green); border: 1px solid rgba(34,211,165,0.3); }
+    .status-error { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+
+    .pulse { animation: pulse-fade 1.2s ease-in-out infinite; }
+
+    @keyframes pulse-fade {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ─── Log console ─────────────────────────────────────────────────────── */
+    .log-console {
+      background: #080c14; border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+      height: 220px; overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+      line-height: 1.7; color: #94a3b8;
+      scroll-behavior: smooth;
+    }
+
+    .log-console::-webkit-scrollbar { width: 4px; }
+    .log-console::-webkit-scrollbar-track { background: transparent; }
+    .log-console::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .log-line { display: block; white-space: pre-wrap; word-break: break-all; }
+    .log-line.success { color: var(--green); }
+    .log-line.error { color: var(--red); }
+    .log-line.info { color: #93c5fd; }
+    .log-line.step { color: var(--yellow); font-weight: 600; }
+
+    /* ─── Jobs list ───────────────────────────────────────────────────────── */
+    .jobs-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; }
+
+    .jobs-list::-webkit-scrollbar { width: 4px; }
+    .jobs-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .job-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+      transition: border-color 0.3s;
+    }
+
+    .job-card:hover { border-color: rgba(79,142,247,0.4); }
+
+    .job-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+    }
+
+    .job-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .job-author { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+
+    .job-time {
+      font-size: 0.65rem; color: var(--text-muted); white-space: nowrap;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 3px 8px; border-radius: 999px; flex-shrink: 0;
+    }
+
+    .job-emails { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+    .email-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.65rem; font-family: 'JetBrains Mono', monospace;
+      background: rgba(79,142,247,0.1); color: var(--accent);
+      border: 1px solid rgba(79,142,247,0.25);
+      padding: 3px 9px; border-radius: 999px;
+    }
+
+    .no-email-tag {
+      font-size: 0.65rem; color: var(--red);
+      background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2);
+      padding: 3px 9px; border-radius: 999px;
+    }
+
+    /* ─── Empty state ─────────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: var(--text-muted);
+    }
+
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+    .empty-state p { font-size: 0.8rem; }
+
+    /* ─── Setup guide ─────────────────────────────────────────────────────── */
+    .setup-steps { display: flex; flex-direction: column; gap: 10px; }
+
+    .setup-step {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 0.78rem; padding: 12px;
+      background: var(--surface2); border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .setup-num {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: white;
+    }
+
+    .setup-text { color: var(--text); }
+    .setup-text span { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+
+    /* ─── Keyword tags ────────────────────────────────────────────────────── */
+    .keyword-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+    .kw-tag {
+      font-size: 0.72rem; font-weight: 600;
+      background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.15));
+      border: 1px solid rgba(79,142,247,0.3);
+      color: var(--accent); padding: 4px 12px; border-radius: 999px;
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: 1fr; }
+      .card-full { grid-column: 1; }
+      .stats-row { flex-wrap: wrap; }
+    }
+
+    /* ─── Scrollbar global ───────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header>
+    <div class="logo-group">
+      <div class="logo-icon">🤖</div>
+      <div class="logo-text">
+        <h1>LinkedIn Auto-Applier</h1>
+        <p>Aditya Rai · Demo API Assignment · Option 1</p>
+      </div>
+    </div>
+    <div class="header-badge">DEMO API · OPTION 1</div>
+  </header>
+
+  <!-- ── Step Progress ──────────────────────────────────────────────────── -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step" id="step1">
+      <div class="step-dot">🔑</div>
+      <div class="step-label">Step 1<br/>LinkedIn Login</div>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-dot">🔍</div>
+      <div class="step-label">Step 2<br/>Search Posts</div>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-dot">📧</div>
+      <div class="step-label">Step 3<br/>Extract Emails</div>
+    </div>
+    <div class="step" id="step4">
+      <div class="step-dot">✉️</div>
+      <div class="step-label">Step 4<br/>Send Emails</div>
+    </div>
+  </div>
+
+  <!-- ── Stats + Controls Grid ──────────────────────────────────────────── -->
+  <div class="grid">
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="card-title">📊 Pipeline Stats</div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num" id="statJobs">—</div>
+          <div class="stat-label">Jobs Found</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="statEmails">—</div>
+          <div class="stat-label">Emails Extracted</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="statSent">—</div>
+          <div class="stat-label">Emails Sent</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; display:flex; align-items:center; gap:10px;">
+        <span class="status-pill status-idle" id="statusPill">
+          <span class="pulse" id="statusDot">●</span>
+          <span id="statusText">Idle</span>
+        </span>
+        <span style="font-size:0.7rem; color:var(--text-muted);" id="timerText"></span>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="card-title">🎯 Search Keywords</div>
+        <div class="keyword-tags">
+          <div class="kw-tag">JAVA DEVELOPER</div>
+          <div class="kw-tag">CONTRACT</div>
+          <div class="kw-tag">Last 24 hours</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card">
+      <div class="card-title">⚙️ Run Options</div>
+      <div class="controls">
+        <div class="toggle-group">
+          <label class="toggle" for="demoMode">
+            <input type="checkbox" id="demoMode" checked/>
+            Demo Mode (mock data)
+          </label>
+          <label class="toggle" for="searchOnly">
+            <input type="checkbox" id="searchOnly"/>
+            Search Only (no emails)
+          </label>
+          <label class="toggle" for="headlessMode">
+            <input type="checkbox" id="headlessMode" checked/>
+            Headless Browser
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnRun" onclick="startPipeline()">
+            ▶ Run Pipeline
+          </button>
+          <button class="btn btn-secondary" id="btnReset" onclick="resetPipeline()">
+            ↺ Reset
+          </button>
+        </div>
+
+        <div style="font-size:0.7rem; color:var(--text-muted); line-height:1.6;">
+          💡 Enable <strong style="color:var(--text);">Demo Mode</strong> to test without real LinkedIn credentials.
+          Disable it for live automation (requires <span style="color:var(--accent);font-family:monospace">.env</span> setup).
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Log Console -->
+    <div class="card card-full">
+      <div class="card-title" style="justify-content:space-between;">
+        <span>🖥️ Live Output Log</span>
+        <button onclick="clearLog()" style="font-size:0.65rem; background:none; border:1px solid var(--border); color:var(--text-muted); padding:3px 10px; border-radius:6px; cursor:pointer;">Clear</button>
+      </div>
+      <div class="log-console" id="logConsole">
+        <span class="log-line info">LinkedIn Auto-Applier — Aditya Rai</span>
+        <span class="log-line info">Ready. Click "Run Pipeline" to start.</span>
+      </div>
+    </div>
+
+    <!-- Jobs Found -->
+    <div class="card card-full">
+      <div class="card-title">💼 Jobs Found (Last 24h)</div>
+      <div class="jobs-list" id="jobsList">
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>No jobs loaded yet. Run the pipeline to fetch LinkedIn posts.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup Guide -->
+    <div class="card card-full">
+      <div class="card-title">📋 Setup Guide (For Live Mode)</div>
+      <div class="setup-steps">
+        <div class="setup-step">
+          <div class="setup-num">1</div>
+          <div class="setup-text">
+            Copy <span>.env.example</span> → <span>.env</span> and fill in your LinkedIn email & password.
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-num">2</div>
+          <div class="setup-text">
+            Go to Google Cloud Console → Enable Gmail API → Create OAuth 2.0 credentials → Download as <span>credentials.json</span> in this folder.
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-num">3</div>
+          <div class="setup-text">
+            Place your resume PDF in the <span>resume/</span> folder as <span>Aditya_Rai_Resume.pdf</span>.
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-num">4</div>
+          <div class="setup-text">
+            Run <span>pip install -r requirements.txt</span> to install dependencies.
+          </div>
+        </div>
+        <div class="setup-step">
+          <div class="setup-num">5</div>
+          <div class="setup-text">
+            Click <strong>Run Pipeline</strong> with Demo Mode OFF for live automation. 
+            First run opens a browser for Gmail OAuth authorization.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+</div><!-- /wrapper -->
+
+<script>
+  let pollInterval = null;
+  let startTimestamp = null;
+
+  // ── Status polling ──────────────────────────────────────────────────────────
+  async function fetchStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      updateUI(data);
+    } catch (e) {
+      appendLog('⚠️ Could not reach server...', 'error');
+    }
+  }
+
+  // ── Update all UI elements ──────────────────────────────────────────────────
+  function updateUI(data) {
+    const status = data.status || 'idle';
+    const step = data.current_step || 0;
+    const jobs = data.jobs || [];
+    const results = data.results_file || {};
+
+    // Status pill
+    const pill = document.getElementById('statusPill');
+    const text = document.getElementById('statusText');
+    pill.className = 'status-pill status-' + status;
+    const icons = { idle:'●', running:'◉', completed:'✔', error:'✕' };
+    document.getElementById('statusDot').textContent = icons[status] || '●';
+    text.textContent = { idle:'Idle', running:'Running...', completed:'Completed', error:'Error' }[status] || status;
+
+    // Steps
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step' + i);
+      el.classList.remove('active', 'done');
+      if (i < step) el.classList.add('done');
+      else if (i === step && status === 'running') el.classList.add('active');
+      else if (status === 'completed') el.classList.add('done');
+    }
+
+    // Stats
+    const totalEmails = jobs.reduce((s, j) => s + (j.emails?.length || 0), 0);
+    document.getElementById('statJobs').textContent   = jobs.length || (results.jobs_found ?? '—');
+    document.getElementById('statEmails').textContent = totalEmails || '—';
+    document.getElementById('statSent').textContent   = data.emails_sent || (results.emails_sent ?? '—');
+
+    // Timer
+    if (data.start_time) {
+      if (!startTimestamp) startTimestamp = new Date(data.start_time);
+      const end = data.end_time ? new Date(data.end_time) : new Date();
+      const secs = Math.floor((end - startTimestamp) / 1000);
+      document.getElementById('timerText').textContent = `⏱ ${secs}s elapsed`;
+    }
+
+    // Logs
+    const logConsole = document.getElementById('logConsole');
+    const logs = data.step_logs || [];
+    if (logs.length > 0) {
+      const rendered = logs.map(l => {
+        let cls = 'log-line';
+        if (l.includes('✅') || l.includes('completed')) cls += ' success';
+        else if (l.includes('❌') || l.includes('Error') || l.includes('error')) cls += ' error';
+        else if (l.includes('STEP') || l.includes('━━━')) cls += ' step';
+        else if (l.includes('🔍') || l.includes('📧') || l.includes('✉️') || l.includes('ℹ')) cls += ' info';
+        return `<span class="${cls}">${escHtml(l)}</span>`;
+      }).join('\n');
+      logConsole.innerHTML = rendered;
+      logConsole.scrollTop = logConsole.scrollHeight;
+    }
+
+    // Jobs list
+    renderJobs(jobs);
+
+    // Buttons
+    const running = status === 'running';
+    document.getElementById('btnRun').disabled = running;
+    document.getElementById('btnReset').disabled = running;
+
+    // Stop polling when done
+    if ((status === 'completed' || status === 'error') && pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+  }
+
+  // ── Render job cards ────────────────────────────────────────────────────────
+  function renderJobs(jobs) {
+    const list = document.getElementById('jobsList');
+    if (!jobs || jobs.length === 0) {
+      list.innerHTML = `<div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>No jobs loaded yet. Run the pipeline to fetch LinkedIn posts.</p>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = jobs.map((j, i) => {
+      const emailTags = j.emails && j.emails.length > 0
+        ? j.emails.map(e => `<span class="email-tag">📧 ${escHtml(e)}</span>`).join('')
+        : `<span class="no-email-tag">No email found</span>`;
+
+      return `
+      <div class="job-card">
+        <div class="job-card-header">
+          <div>
+            <div class="job-title">${escHtml(j.title || 'Untitled')}</div>
+            <div class="job-author">👤 ${escHtml(j.author || 'Unknown')} · 🔗 LinkedIn</div>
+          </div>
+          <div class="job-time">${escHtml(j.timestamp || '')}</div>
+        </div>
+        <div class="job-emails">${emailTags}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Run pipeline ────────────────────────────────────────────────────────────
+  async function startPipeline() {
+    startTimestamp = null;
+    clearLog();
+    appendLog('🚀 Starting pipeline...', 'info');
+
+    const body = {
+      demo:        document.getElementById('demoMode').checked,
+      search_only: document.getElementById('searchOnly').checked,
+      headless:    document.getElementById('headlessMode').checked,
+    };
+
+    try {
+      const res = await fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.error) { appendLog('❌ ' + data.error, 'error'); return; }
+
+      // Start polling every 1.5s
+      pollInterval = setInterval(fetchStatus, 1500);
+      fetchStatus();
+    } catch (e) {
+      appendLog('❌ Failed to connect to server: ' + e, 'error');
+    }
+  }
+
+  // ── Reset pipeline ──────────────────────────────────────────────────────────
+  async function resetPipeline() {
+    startTimestamp = null;
+    if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    await fetch('/api/reset', { method: 'POST' });
+    clearLog();
+    appendLog('↺ Pipeline reset. Ready to run.', 'info');
+    // Reset steps and stats
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step' + i);
+      el.classList.remove('active', 'done');
+    }
+    document.getElementById('statJobs').textContent   = '—';
+    document.getElementById('statEmails').textContent = '—';
+    document.getElementById('statSent').textContent   = '—';
+    document.getElementById('timerText').textContent  = '';
+    document.getElementById('statusPill').className   = 'status-pill status-idle';
+    document.getElementById('statusText').textContent = 'Idle';
+    document.getElementById('jobsList').innerHTML     = `<div class="empty-state">
+      <div class="icon">🔍</div><p>No jobs loaded yet. Run the pipeline to fetch LinkedIn posts.</p></div>`;
+  }
+
+  function clearLog() {
+    document.getElementById('logConsole').innerHTML = '';
+  }
+
+  function appendLog(msg, cls = '') {
+    const console = document.getElementById('logConsole');
+    const span = document.createElement('span');
+    span.className = 'log-line ' + cls;
+    span.textContent = msg;
+    console.appendChild(span);
+    console.appendChild(document.createTextNode('\n'));
+    console.scrollTop = console.scrollHeight;
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+  fetchStatus();
+</script>
+</body>
+</html>

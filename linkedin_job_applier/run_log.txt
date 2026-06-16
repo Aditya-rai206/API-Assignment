@@ -1,0 +1,114 @@
+09:42:13  [INFO]  Candidate : Aditya Rai
+09:42:13  [INFO]  Keywords  : ['JAVA DEVELOPER', 'CONTRACT']
+09:42:13  [INFO]  Max hours : 24h
+09:42:13  [INFO]  Max jobs  : 20
+09:42:13  [INFO]  Demo mode : True
+09:42:13  [INFO]  
+🎭 DEMO MODE — Using mock LinkedIn data
+
+09:42:13  [INFO]  Loaded 2 demo job posts
+09:42:13  [INFO]  
+━━━ STEP 3: Recruiter Emails Extracted ━━━━━━━━━━━━━━━━━━━━━
+09:42:13  [INFO]  Jobs found: 2 | Emails extracted: 2
+09:42:13  [INFO]  
+Search-only mode — skipping email sending.
+09:42:13  [INFO]  📁 Results saved to results.json
+09:46:09  [INFO]  Candidate : Aditya Rai
+09:46:09  [INFO]  Keywords  : ['JAVA DEVELOPER', 'CONTRACT']
+09:46:09  [INFO]  Max hours : 24h
+09:46:09  [INFO]  Max jobs  : 20
+09:46:09  [INFO]  Demo mode : True
+09:46:09  [INFO]  
+🎭 DEMO MODE — Using mock LinkedIn data
+
+09:46:09  [INFO]  Loaded 2 demo job posts
+09:46:09  [INFO]  
+━━━ STEP 3: Recruiter Emails Extracted ━━━━━━━━━━━━━━━━━━━━━
+09:46:09  [INFO]  Jobs found: 2 | Emails extracted: 2
+09:46:09  [INFO]  
+━━━ STEP 4: Sending Application Emails via Gmail API ━━━━━━━━
+09:46:09  [INFO]    [1] Sending to demo.recruiter@techcorp.com for 'Java Developer (Contract)'...
+09:46:09  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:09  [INFO]    ⏳ Waiting 10s before next email...
+09:46:12  [INFO]  Candidate : Aditya Rai
+09:46:12  [INFO]  Keywords  : ['JAVA DEVELOPER', 'CONTRACT']
+09:46:12  [INFO]  Max hours : 24h
+09:46:12  [INFO]  Max jobs  : 20
+09:46:12  [INFO]  Demo mode : True
+09:46:12  [INFO]  
+🎭 DEMO MODE — Using mock LinkedIn data
+
+09:46:12  [INFO]  Loaded 2 demo job posts
+09:46:12  [INFO]  
+━━━ STEP 3: Recruiter Emails Extracted ━━━━━━━━━━━━━━━━━━━━━
+09:46:12  [INFO]  Jobs found: 2 | Emails extracted: 2
+09:46:12  [INFO]  
+━━━ STEP 4: Sending Application Emails via Gmail API ━━━━━━━━
+09:46:12  [INFO]    [1] Sending to demo.recruiter@techcorp.com for 'Java Developer (Contract)'...
+09:46:12  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:12  [INFO]    ⏳ Waiting 10s before next email...
+09:46:19  [INFO]    [2] Sending to hiring@innovatetech.io for 'Java Backend Developer'...
+09:46:19  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:19  [INFO]  
+✅ Pipeline complete!
+09:46:19  [INFO]     Jobs found     : 2
+09:46:19  [INFO]     Emails sent    : 0
+09:46:19  [INFO]     Failed/skipped : 2
+09:46:19  [INFO]  📁 Results saved to results.json
+09:46:19  [INFO]  
+Done. Check results.json for the full report.
+09:46:22  [INFO]    [2] Sending to hiring@innovatetech.io for 'Java Backend Developer'...
+09:46:22  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:22  [INFO]  
+✅ Pipeline complete!
+09:46:22  [INFO]     Jobs found     : 2
+09:46:22  [INFO]     Emails sent    : 0
+09:46:22  [INFO]     Failed/skipped : 2
+09:46:22  [INFO]  📁 Results saved to results.json
+09:46:22  [INFO]  
+Done. Check results.json for the full report.
+09:46:40  [INFO]  Candidate : Aditya Rai
+09:46:40  [INFO]  Keywords  : ['JAVA DEVELOPER', 'CONTRACT']
+09:46:40  [INFO]  Max hours : 24h
+09:46:40  [INFO]  Max jobs  : 20
+09:46:40  [INFO]  Demo mode : True
+09:46:40  [INFO]  
+🎭 DEMO MODE — Using mock LinkedIn data
+
+09:46:40  [INFO]  Loaded 2 demo job posts
+09:46:40  [INFO]  
+━━━ STEP 3: Recruiter Emails Extracted ━━━━━━━━━━━━━━━━━━━━━
+09:46:40  [INFO]  Jobs found: 2 | Emails extracted: 2
+09:46:40  [INFO]  
+━━━ STEP 4: Sending Application Emails via Gmail API ━━━━━━━━
+09:46:40  [INFO]    [1] Sending to demo.recruiter@techcorp.com for 'Java Developer (Contract)'...
+09:46:40  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:40  [INFO]    ⏳ Waiting 10s before next email...
+09:46:50  [INFO]    [2] Sending to hiring@innovatetech.io for 'Java Backend Developer'...
+09:46:50  [ERROR]  'credentials.json' not found. Please download OAuth 2.0 credentials from Google Cloud Console and save as 'credentials.json' in the project root directory.
+09:46:50  [INFO]  
+✅ Pipeline complete!
+09:46:50  [INFO]     Jobs found     : 2
+09:46:50  [INFO]     Emails sent    : 0
+09:46:50  [INFO]     Failed/skipped : 2
+09:46:50  [INFO]  📁 Results saved to results.json
+09:46:50  [INFO]  
+Done. Check results.json for the full report.
+09:49:22  [INFO]  Candidate : Aditya Rai
+09:49:22  [INFO]  Keywords  : ['JAVA DEVELOPER', 'CONTRACT']
+09:49:22  [INFO]  Max hours : 24h
+09:49:22  [INFO]  Max jobs  : 20
+09:49:22  [INFO]  Demo mode : False
+09:49:22  [INFO]  
+━━━ STEP 1: LinkedIn Login ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+09:49:22  [INFO]  ====== WebDriver manager ======
+09:49:25  [INFO]  Get LATEST chromedriver version for google-chrome
+09:49:25  [INFO]  There is no [win64] chromedriver "149.0.7827.115" for browser google-chrome "149.0.7827" in cache
+09:49:26  [INFO]  There is no [win64] chromedriver "149.0.7827.115" for browser google-chrome "149.0.7827" in cache
+09:49:26  [INFO]  Get LATEST chromedriver version for google-chrome
+09:49:27  [INFO]  WebDriver version 149.0.7827.115 selected
+09:49:27  [INFO]  Modern chrome version https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.115/win64/chromedriver-win64.zip
+09:49:27  [INFO]  About to download new driver from https://storage.googleapis.com/chrome-for-testing-public/149.0.7827.115/win64/chromedriver-win64.zip
+09:49:28  [INFO]  Driver downloading response is 200
+09:49:30  [INFO]  Driver has been saved in cache [C:\Users\aryan\.wdm\drivers\chromedriver\win64\149.0.7827.115]
+09:49:31  [INFO]  🔑 Logging in with credentials...
